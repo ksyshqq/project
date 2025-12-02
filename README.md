@@ -355,9 +355,8 @@ This project showcases comprehensive capabilities in:
 
 ## 📬 Contact
 
-**Author:** Rogova Ksenia,Musanap Aidemir
-**GitHub:**  
-**Email:** kkseniaky@gmail.com
+**Author:** Rogova Ksenia,Mussanap Aidemir
+**Email:** kkseniaky@gmail.com,britishpay@gmail.com
 
 *Note: Update contact information as needed*
 
