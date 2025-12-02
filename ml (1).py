@@ -13,14 +13,14 @@ import plotly.graph_objects as go
 from dash import Dash, dcc, html, dash_table
 import webbrowser
 
-# ---------------------- 0. Файлы ----------------------
+# Файлы 
 file_eq = 'earthquake_data_tsunami.csv'
 file_cities = 'worldcities.csv'
 
 if not os.path.exists(file_eq) or not os.path.exists(file_cities):
     raise FileNotFoundError("Убедитесь, что файлы earthquake_data_tsunami.csv и worldcities.csv находятся в текущей папке")
 
-# ---------------------- 1. Загрузка данных ----------------------
+#  Загрузка данных 
 df_raw = pd.read_csv(file_eq)
 df = df_raw.copy()
 
@@ -28,7 +28,7 @@ cities_df = pd.read_csv(file_cities)
 cities = cities_df[['city', 'lat', 'lng', 'population', 'country']].copy()
 cities.rename(columns={'lat': 'city_lat', 'lng': 'city_lng', 'city': 'name'}, inplace=True)
 
-# ---------------------- 2. Подготовка целевой переменной ----------------------
+#  2. Подготовка целевой переменной 
 df['tsunami'] = df['tsunami'].astype(int)
 features = ['magnitude', 'cdi', 'mmi', 'sig', 'nst', 'dmin', 'gap', 'depth', 'latitude', 'longitude', 'Year', 'Month']
 
@@ -36,7 +36,7 @@ for c in features:
     if c in df.columns:
         df[c] = pd.to_numeric(df[c], errors='coerce')
 
-# ---------------------- 3. Обучение моделей ----------------------
+#  Обучение моделей 
 X = df[['magnitude', 'cdi', 'mmi', 'sig', 'nst', 'dmin', 'gap', 'depth', 'latitude', 'longitude']].copy()
 y = df['tsunami']
 
@@ -68,7 +68,7 @@ report_gb = classification_report(y_test, y_pred_gb, zero_division=0)
 auc_rf = roc_auc_score(y_test, rf.predict_proba(X_test)[:, 1])
 auc_gb = roc_auc_score(y_test, gb.predict_proba(X_test)[:, 1])
 
-# ---------------------- 4. Вспомогательные функции для радиуса и риска ----------------------
+#  Вспомогательные функции для радиуса и риска 
 def calculate_earthquake_radius(magnitude, cdi, mmi, sig, depth, tsunami, nst=None):
     base_radius = 10 ** (0.43 * magnitude - 1.2)
     depth_factor = 1.8 - (depth / 100) if depth <= 70 else 1.1 - (depth / 500)
@@ -141,7 +141,7 @@ def find_cities_at_risk(earthquake_lat, earthquake_lon, radius_km):
             })
     return pd.DataFrame(affected)
 
-# ---------------------- 5. Старые глобусы ----------------------
+#Старые глобусы 
 fig_points = px.scatter_geo(
     df,
     lat='latitude', lon='longitude',
@@ -170,7 +170,7 @@ fig_heat.add_trace(go.Scattergeo(
 fig_heat.update_geos(projection_type="orthographic", showland=True, landcolor="LightGray", showcountries=True)
 fig_heat.update_layout(title="Имитация тепловой карты", height=750, margin={"r":0,"t":40,"l":0,"b":0})
 
-# ---------------------- 6. Таймлапсы ----------------------
+# Таймлапсы 
 # Сортируем данные по году
 df_sorted = df[df['Year'] >= 2015].sort_values(by="Year", ascending=True)
 
@@ -226,7 +226,7 @@ fig_fact_risk.update_geos(projection_type="orthographic", showland=True, showcou
 fig_fact_risk.update_layout(height=750, margin={"r":0,"t":40,"l":0,"b":0})
 
 
-# ---------------------- 7. Dash приложение ----------------------
+# Dash приложение
 app = Dash(__name__, suppress_callback_exceptions=True)
 server = app.server
 df_head = df.head(50)
@@ -263,7 +263,7 @@ app.layout = html.Div([
     )
 ], style={'backgroundColor': '#1e1e1e', 'color': '#f5f5f5', 'fontFamily': 'Arial, sans-serif', 'margin': '0 auto', 'maxWidth': '1400px'})
 
-# ---------------------- 8. Запуск ----------------------
+#  Запуск 
 if __name__ == '__main__':
     url = "http://127.0.0.1:8050"
     print(f"Запуск Dash приложения на {url}")
